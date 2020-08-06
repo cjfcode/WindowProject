@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WpfApp1">
+    
+    <Style TargetType="{x:Type Border}" x:Key="Border">
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <Style.Triggers>
+            <!-- Set border size to 0 if window is maximized, this prevents the border from showing when the window is maximized -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}, Path=WindowState}" Value="Maximized">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Margin" Value="{Binding MaximizeFix, Mode=OneWay}" />
+            </DataTrigger>
+
+            <!--Active window border color-->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}, Path=IsActive}" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource GreenAccentBrush}" />
+            </DataTrigger>
+
+            <!--Inactive window border color-->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}, Path=IsActive}" Value="False">
+                <Setter Property="BorderBrush" Value="{DynamicResource InactiveWindowBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
