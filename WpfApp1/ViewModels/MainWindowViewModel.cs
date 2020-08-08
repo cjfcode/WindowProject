@@ -29,48 +29,5 @@ namespace WpfApp1
             0
             //SystemParameters.WindowNonClientFrameThickness.Bottom + SystemParameters.WindowResizeBorderThickness.Bottom
         );
-
-        public RelayCommand MinimizeMainWindow { get => new RelayCommand(MinimizeWindow); }
-
-        public RelayCommand MaximizeMainWindow { get => new RelayCommand(MaximizeWindow); }
-
-        public RelayCommand CloseMainWindow { get => new RelayCommand(CloseWindow); }
-
-        public RelayCommand NoBorderCommand { get => new RelayCommand(NoBorder); }
-        public RelayCommand BorderCommand { get => new RelayCommand(Border); }
-
-        private void NoBorder()
-        {
-            Application.Current.Resources.MergedDictionaries.Remove(Application.Current.Resources.MergedDictionaries[3]);
-            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("Themes/NoBorder.xaml", UriKind.Relative) });
-        }
-
-        private void Border()
-        {
-            Application.Current.Resources.MergedDictionaries.Remove(Application.Current.Resources.MergedDictionaries[3]);
-            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("Themes/Border.xaml", UriKind.Relative) });
-        }
-
-        private void MinimizeWindow()
-        {
-            SystemCommands.MinimizeWindow(Application.Current.MainWindow);
-        }
-
-        private void MaximizeWindow()
-        {
-            if (Application.Current.MainWindow.WindowState == WindowState.Normal)
-            {
-                SystemCommands.MaximizeWindow(Application.Current.MainWindow);
-            }
-            else if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
-            {
-                SystemCommands.RestoreWindow(Application.Current.MainWindow);
-            }
-        }
-
-        private void CloseWindow()
-        {
-            SystemCommands.CloseWindow(Application.Current.MainWindow);
-        }
     }
 }
