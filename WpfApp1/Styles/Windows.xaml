@@ -64,7 +64,7 @@
                 <Setter TargetName="RootBorder" Property="BorderBrush" Value="{DynamicResource BlueAccentBrush}" />
             </Trigger>
             <Trigger Property="WindowState" Value="Maximized">
-                <Setter TargetName="RootBorder" Property="BorderThickness" Value="{Binding Source={x:Static local:WindowChromeHelper.WindowResizeBorderThickness}, Converter={local:WindowBorderThicknessConverter}}" />
+                <Setter TargetName="RootBorder" Property="BorderThickness" Value="{Binding Source={x:Static local:WindowChromeHelper.WindowResizeBorderThickness}}" />
                 <Setter TargetName="RootBorder" Property="BorderBrush" Value="Transparent" />
                 <Setter TargetName="MaximizeRestoreButton" Property="Content" Value="&#xE923;" />
             </Trigger>
