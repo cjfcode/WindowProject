@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace WpfApp1
 {
@@ -10,16 +12,6 @@ namespace WpfApp1
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
         public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, WindowLongFlags nIndex, IntPtr dwNewLong);
-
-        public static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if(msg == 0x85)
-            {
-                // HANDLE WM_NCPAINT
-            }
-
-            return IntPtr.Zero;
-        }
 
         public static IntPtr SetWindowLongPtr(HandleRef hWnd, WindowLongFlags nIndex, IntPtr dwNewLong)
         {
@@ -38,6 +30,18 @@ namespace WpfApp1
             DWLP_USER = 0x8,
             DWLP_MSGRESULT = 0x0,
             DWLP_DLGPROC = 0x4
+        }
+
+        internal enum WVR
+        {
+            ALIGNTOP = 0x0010,
+            ALIGNLEFT = 0x0020,
+            ALIGNBOTTOM = 0x0040,
+            ALIGNRIGHT = 0x0080,
+            HREDRAW = 0x0100,
+            VREDRAW = 0x0200,
+            VALIDRECTS = 0x0400,
+            REDRAW = HREDRAW | VREDRAW
         }
     }
 }
