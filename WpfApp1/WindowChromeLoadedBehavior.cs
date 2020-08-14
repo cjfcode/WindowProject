@@ -11,6 +11,8 @@ namespace WpfApp1
 {
     public class WindowChromeLoadedBehavior : Behavior<FrameworkElement>
     {
+        private Window window;
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -25,7 +27,7 @@ namespace WpfApp1
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(AssociatedObject);
+            window = Window.GetWindow(AssociatedObject);
 
             if (window == null) return;
 
@@ -59,27 +61,48 @@ namespace WpfApp1
         {
             switch (msg)
             {
-                // WM_NCCALCSIZE
-                case 0x83:
+                case NativeMethods.WM_NCPAINT:
+                    RemoveFrame();
+                    handled = false;
+                    break;
+
+                case NativeMethods.WM_NCCALCSIZE:
+
+                    handled = false;
+
                     var rcClientArea = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
-                    
                     rcClientArea.Bottom += (int)(WindowChromeHelper.WindowResizeBorderThickness.Bottom / 2);
-                    
                     Marshal.StructureToPtr(rcClientArea, lParam, false);
-                    
-                    handled = true;
-                    
+
                     var retVal = IntPtr.Zero;
-                    
                     if (wParam == new IntPtr(1))
                     {
                         retVal = new IntPtr((int)NativeMethods.WVR.REDRAW);
                     }
-                    
                     return retVal;
             }
 
             return IntPtr.Zero;
+        }
+
+        private void RemoveFrame()
+        {
+            if (Environment.OSVersion.Version.Major >= 6 && NativeMethods.IsDwmAvailable())
+            {
+                if (NativeMethods.DwmIsCompositionEnabled() && SystemParameters.DropShadow)
+                {
+                    NativeMethods.MARGINS margins;
+
+                    margins.bottomHeight = -1;
+                    margins.leftWidth = 0;
+                    margins.rightWidth = 0;
+                    margins.topHeight = 0;
+
+                    var helper = new WindowInteropHelper(window);
+
+                    NativeMethods.DwmExtendFrameIntoClientArea(helper.Handle, ref margins);
+                }
+            }
         }
 
         [Serializable]
