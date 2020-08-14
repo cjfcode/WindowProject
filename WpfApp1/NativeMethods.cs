@@ -1,8 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Interop;
 
 namespace WpfApp1
 {
@@ -10,12 +7,6 @@ namespace WpfApp1
     {
         public const int WM_NCCALCSIZE = 0x83;
         public const int WM_NCPAINT = 0x85;
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
-        public static extern int SetWindowLong32(HandleRef hWnd, WindowLongFlags nIndex, int dwNewLong);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
-        public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, WindowLongFlags nIndex, IntPtr dwNewLong);
 
         [DllImport("kernel32", SetLastError = true)]
         private static extern IntPtr LoadLibrary(string lpFileName);
@@ -33,11 +24,6 @@ namespace WpfApp1
             public int rightWidth;
             public int topHeight;
             public int bottomHeight;
-        }
-
-        public static IntPtr SetWindowLongPtr(HandleRef hWnd, WindowLongFlags nIndex, IntPtr dwNewLong)
-        {
-            return IntPtr.Size == 8 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong) : new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
         }
 
         private delegate int DwmExtendFrameIntoClientAreaDelegate(IntPtr hwnd, ref MARGINS margins);
@@ -70,20 +56,6 @@ namespace WpfApp1
                 return false;
             }
             return true;
-        }
-
-        public enum WindowLongFlags
-        {
-            GWL_EXSTYLE = -20,
-            GWLP_HINSTANCE = -6,
-            GWLP_HWNDPARENT = -8,
-            GWL_ID = -12,
-            GWL_STYLE = -16,
-            GWL_USERDATA = -21,
-            GWL_WNDPROC = -4,
-            DWLP_USER = 0x8,
-            DWLP_MSGRESULT = 0x0,
-            DWLP_DLGPROC = 0x4
         }
 
         internal enum WVR
