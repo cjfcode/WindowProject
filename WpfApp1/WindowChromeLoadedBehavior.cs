@@ -11,6 +11,8 @@ namespace WpfApp1
 {
     public class WindowChromeLoadedBehavior : Behavior<FrameworkElement>
     {
+        private Window window;
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -25,7 +27,7 @@ namespace WpfApp1
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(AssociatedObject);
+            window = Window.GetWindow(AssociatedObject);
 
             if (window == null) return;
 
@@ -59,27 +61,60 @@ namespace WpfApp1
         {
             switch (msg)
             {
-                // WM_NCCALCSIZE
-                case 0x83:
-                    var rcClientArea = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
-                    
-                    rcClientArea.Bottom += (int)(WindowChromeHelper.WindowResizeBorderThickness.Bottom / 2);
-                    
-                    Marshal.StructureToPtr(rcClientArea, lParam, false);
-                    
+                case NativeMethods.WM_NCPAINT:
+                    RemoveFrame();
+                    handled = false;
+                    break;
+
+                case NativeMethods.WM_NCCALCSIZE:
+
                     handled = true;
-                    
+
+                    var rcClientArea = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
+                    rcClientArea.Bottom += (int)(WindowChromeHelper.WindowResizeBorderThickness.Bottom / 2);
+                    Marshal.StructureToPtr(rcClientArea, lParam, false);
+
                     var retVal = IntPtr.Zero;
-                    
+
                     if (wParam == new IntPtr(1))
                     {
                         retVal = new IntPtr((int)NativeMethods.WVR.REDRAW);
                     }
-                    
+
                     return retVal;
             }
 
             return IntPtr.Zero;
+        }
+
+        private void RemoveFrame()
+        {
+            if (Environment.OSVersion.Version.Major >= 6 && NativeMethods.IsDwmAvailable())
+            {
+                if (NativeMethods.DwmIsCompositionEnabled() && SystemParameters.DropShadow)
+                {
+                    // to get the aero shadow back, margins have to be set on at least one side
+                    // don't use negative values for the margins because it causes flickering when restoring or maximizing the window
+                    // setting the margin on the left or top sides seem best, since the window never appears to flicker there on resizing
+                    // but the right and bottom sometimes do, otherwise there will occasionally be white flicker when resizing the window.
+
+                    // setting margin to 10 on the bottom, though, fixes a brief flicker of black that occurs when
+                    // activating a maximized window from its taskbar peek.
+                    // (this is probably caused by the border inflation hack used to fit the frameless window fully on the screen)
+                    // ideally should set margins to 9-10 on the bottom when maximized and 0 on the bottom when restored
+                    // to avoid the flicker on restore.
+                    NativeMethods.MARGINS margins;
+
+                    margins.bottomHeight = 0;
+                    margins.leftWidth = 1;
+                    margins.rightWidth = 0;
+                    margins.topHeight = 0;
+
+                    var helper = new WindowInteropHelper(window);
+
+                    NativeMethods.DwmExtendFrameIntoClientArea(helper.Handle, ref margins);
+                }
+            }
         }
 
         [Serializable]
