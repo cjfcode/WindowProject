@@ -11,10 +11,10 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
-    <Grid Background="LightBlue">
+    <Grid Background="{StaticResource MainBackgroundBrush}">
         <Border
             Height="16"
             VerticalAlignment="Bottom"
-            Background="Red" />
+            Background="{StaticResource MainBackgroundBrush}" />
     </Grid>
 </Window>

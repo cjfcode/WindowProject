@@ -12,6 +12,7 @@ namespace WpfApp1
     public class WindowChromeLoadedBehavior : Behavior<FrameworkElement>
     {
         private Window window;
+        private bool loaded;
 
         protected override void OnAttached()
         {
@@ -55,6 +56,16 @@ namespace WpfApp1
 
             var hWnd = new WindowInteropHelper(window).Handle;
             HwndSource.FromHwnd(hWnd)?.AddHook(WndProc);
+
+            // fixes the flickering during initial window transition
+            // and also oddly fixes the flickering when activating
+            // the maximized window from a minimized state on preview
+            // without the need to set bottom margin to 10
+            // (no idea why this would affect this!)
+            Task.Delay(300).ContinueWith(_ =>
+            {
+                loaded = true;
+            });
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -70,18 +81,14 @@ namespace WpfApp1
 
                     handled = true;
 
-                    var rcClientArea = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
-                    rcClientArea.Bottom += (int)(WindowChromeHelper.WindowResizeBorderThickness.Bottom / 2);
-                    Marshal.StructureToPtr(rcClientArea, lParam, false);
-
-                    var retVal = IntPtr.Zero;
-
-                    if (wParam == new IntPtr(1))
+                    if(loaded)
                     {
-                        retVal = new IntPtr((int)NativeMethods.WVR.REDRAW);
+                        var rcClientArea = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
+                        rcClientArea.Bottom += (int)(WindowChromeHelper.WindowResizeBorderThickness.Bottom / 2);
+                        Marshal.StructureToPtr(rcClientArea, lParam, false);
                     }
 
-                    return retVal;
+                    return wParam == new IntPtr(1) ? new IntPtr((int)NativeMethods.WVR.REDRAW) : IntPtr.Zero;
             }
 
             return IntPtr.Zero;
@@ -97,12 +104,6 @@ namespace WpfApp1
                     // don't use negative values for the margins because it causes flickering when restoring or maximizing the window
                     // setting the margin on the left or top sides seem best, since the window never appears to flicker there on resizing
                     // but the right and bottom sometimes do, otherwise there will occasionally be white flicker when resizing the window.
-
-                    // setting margin to 10 on the bottom, though, fixes a brief flicker of black that occurs when
-                    // activating a maximized window from its taskbar peek.
-                    // (this is probably caused by the border inflation hack used to fit the frameless window fully on the screen)
-                    // ideally should set margins to 9-10 on the bottom when maximized and 0 on the bottom when restored
-                    // to avoid the flicker on restore.
                     NativeMethods.MARGINS margins;
 
                     margins.bottomHeight = 0;
