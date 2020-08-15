@@ -17,6 +17,25 @@ namespace WpfApp1
         [DllImport("kernel32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         private static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
+        public enum DWMWINDOWATTRIBUTE : uint
+        {
+            NCRenderingEnabled = 1,
+            NCRenderingPolicy,
+            TransitionsForceDisabled,
+            AllowNCPaint,
+            CaptionButtonBounds,
+            NonClientRtlLayout,
+            ForceIconicRepresentation,
+            Flip3DPolicy,
+            ExtendedFrameBounds,
+            HasIconicBitmap,
+            DisallowPeek,
+            ExcludedFromPeek,
+            Cloak,
+            Cloaked,
+            FreezeRepresentation
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public struct MARGINS
         {
@@ -69,5 +88,8 @@ namespace WpfApp1
             VALIDRECTS = 0x0400,
             REDRAW = HREDRAW | VREDRAW
         }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
     }
 }

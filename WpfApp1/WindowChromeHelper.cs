@@ -73,6 +73,5 @@ namespace WpfApp1
             CYFRAME = 33,
             SM_CXPADDEDBORDER = 92
         }
-
     }
 }

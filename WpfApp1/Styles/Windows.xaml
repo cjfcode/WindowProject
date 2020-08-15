@@ -4,11 +4,11 @@
     xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
     xmlns:local="clr-namespace:WpfApp1">
 
-    <ControlTemplate x:Key="WindowTemplate" TargetType="{x:Type Window}">
+    <ControlTemplate x:Key="WindowTemplate" TargetType="{x:Type Window}" >
+        <!--<i:Interaction.Behaviors>
+            <local:WindowChromeLoadedBehavior />
+        </i:Interaction.Behaviors>-->
         <Grid>
-            <i:Interaction.Behaviors>
-                <local:WindowChromeLoadedBehavior />
-            </i:Interaction.Behaviors>
             <Border x:Name="RootBorder"
                 Margin="{x:Static local:WindowChromeHelper.LayoutOffsetThickness}"
                 BorderBrush="{DynamicResource InactiveWindowBrush}"
